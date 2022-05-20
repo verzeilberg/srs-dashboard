@@ -2,8 +2,13 @@
 
 namespace App\Service\Zabbix;
 
+use App\System\DotEnv;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use stdClass;
@@ -27,6 +32,10 @@ class ZabbixClient
                 'Content-Type' => 'application/json-rpc',
             ]
         ]);
+
+        new Dotenv();
+        $this->zabbixCredentialsUsername = getenv('zabbix_username');
+        $this->zabbixCredentialsPassword = getenv('zabbix_password');
     }
 
     /**
@@ -39,8 +48,8 @@ class ZabbixClient
         $body->method  = 'user.login';
 
         $params           = new \stdClass();
-        $params->user     = self::client_username;
-        $params->password = self::client_password;
+        $params->user     = $this->zabbixCredentialsUsername ;
+        $params->password = $this->zabbixCredentialsPassword;
         $body->params     = $params;
 
         $body->id   = 1;
@@ -51,6 +60,13 @@ class ZabbixClient
         return $this->httpClient->request('POST', self::client_host, ['body' => $jsonEncodedBody]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function getHosts(array $search = [])
     {
         $response = $this->login();
