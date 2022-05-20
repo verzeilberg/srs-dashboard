@@ -33,9 +33,9 @@ class ZabbixClient
             ]
         ]);
 
-        new Dotenv();
-        $this->zabbixCredentialsUsername = getenv('zabbix_username');
-        $this->zabbixCredentialsPassword = getenv('zabbix_password');
+        $dotEnv = new Dotenv();
+        $this->zabbixCredentialsUsername = $dotEnv->getEnv('zabbix_username');
+        $this->zabbixCredentialsPassword = $dotEnv->getEnv('zabbix_password');
     }
 
     /**

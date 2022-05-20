@@ -1,11 +1,5 @@
-@font-face {
-    font-family: 'DIGITAL';
-    src: url('https://cssdeck.com/uploads/resources/fonts/digii/DS-DIGII.TTF');
-}
-
 .digital-clock {
-    width: 200px;
     height: 60px;
     color: #000000;
-    font: 50px/60px 'DIGITAL', Helvetica;
+    font: 50px/60px Helvetica;
 }
