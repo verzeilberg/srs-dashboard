@@ -32,19 +32,12 @@ function clockUpdate() {
         }
     }
 
-    function twelveHour(x) {
-        if (x > 12) {
-            return x = x - 12;
-        } else if (x == 0) {
-            return x = 12;
-        } else {
-            return x;
-        }
-    }
-
-    var h = addZero(twelveHour(date.getHours()));
+    var d = addZero(date.getDay());
+    var mo = addZero(date.getMonth());
+    var y = date.getFullYear();
+    var h = addZero(date.getHours());
     var m = addZero(date.getMinutes());
     var s = addZero(date.getSeconds());
 
-    $('.digital-clock').text(h + ':' + m + ':' + s)
-}s
+    $('.digital-clock').text(d + '-' + mo + '-' + y + ' ' + h + ':' + m + ':' + s);
+}
