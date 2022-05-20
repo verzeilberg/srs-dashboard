@@ -14,20 +14,10 @@ class DashboardController extends AbstractController
      */
     public function index(ZabbixClient $zabbixClient): Response
     {
-        echo '<pre>';
-        $result = $zabbixClient->getHosts(['production-db-dedicated']);
+        $hosts = $zabbixClient->getHosts(['production-db-dedicated']);
 
-        var_dump($result); die;
-
-
-        foreach ($result as $host)
-        {
-            echo $host->host . '<br/>';
-        }
-
-        die;
         return $this->render('dashboard/index.html.twig', [
-            'controller_name' => 'DashboardController',
+            'hosts' => $hosts
         ]);
     }
 }
