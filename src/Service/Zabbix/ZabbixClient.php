@@ -106,7 +106,7 @@ class ZabbixClient
 
     }
 
-    public function getProblems()
+    public function getProblems(array $hostids)
     {
         $response = $this->login();
 
@@ -115,9 +115,36 @@ class ZabbixClient
         $body->method  = 'problem.get';
 
         $params             =  new \stdClass();
-        $params->recent  = "true";
+        $params->output = "extend";
+        $params->selectAcknowledges = "extend";
+        $params->selectTags= "extend";
+        $params->selectSuppressionData = "extend";
+        $params->hostids = $hostids;
+        $params->recent = true;
+        $params->severities = 1;
         $params->sortfield  =  ["eventid"];
         $params->sortorder  = "DESC";
+        $body->params       = $params;
+
+        $body->id   = 1;
+        $body->auth = $response->toArray()["result"];
+
+        $jsonEncodedBody = json_encode($body);
+
+        return $this->returnResultObjects($this->httpClient->request('POST', self::client_host, ['body' => $jsonEncodedBody]));
+    }
+
+    public function getAlerts(array $hostids)
+    {
+        $response = $this->login();
+
+        $body          = new \stdClass();
+        $body->jsonrpc = '2.0';
+        $body->method  = 'alert.get';
+
+        $params             =  new \stdClass();
+        $params->hostids = $hostids;
+        $params->output = "extend";
         $body->params       = $params;
 
         $body->id   = 1;
