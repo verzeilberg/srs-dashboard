@@ -77,13 +77,13 @@ class ZabbixClient
 
         $params           = new \stdClass();
         $params->output     = [
-            "hostid",
-            "host",
-            "name"
+            'hostid',
+            'host',
+            'name'
         ];
         $params->selectInterfaces = [
-            "interfaceid",
-            "ip"
+            'interfaceid',
+            'ip'
         ];
 
         if (count($search) > 0) {
@@ -92,8 +92,9 @@ class ZabbixClient
             $params->search = $host;
         }
 
-        $params->sortfield  =  ["name"];
-        $params->sortorder  = "ASC";
+
+        $params->sortfield  =  ['name'];
+        $params->sortorder  = 'ASC';
 
         $body->params     = $params;
 
@@ -116,12 +117,9 @@ class ZabbixClient
 
         $params             =  new \stdClass();
         $params->output = "extend";
-        $params->selectAcknowledges = "extend";
-        $params->selectTags= "extend";
-        $params->selectSuppressionData = "extend";
         $params->hostids = $hostids;
         $params->recent = true;
-        $params->severities = 1;
+        $params->limit = 1;
         $params->sortfield  =  ["eventid"];
         $params->sortorder  = "DESC";
         $body->params       = $params;
@@ -134,6 +132,13 @@ class ZabbixClient
         return $this->returnResultObjects($this->httpClient->request('POST', self::client_host, ['body' => $jsonEncodedBody]));
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function getAlerts(array $hostids)
     {
         $response = $this->login();
@@ -142,10 +147,14 @@ class ZabbixClient
         $body->jsonrpc = '2.0';
         $body->method  = 'alert.get';
 
-        $params             =  new \stdClass();
+        $params          =  new \stdClass();
+
+        $params->output  = 'extend';
+        $params->sortfield  =  ["clock"];
+        $params->sortorder  = "DESC";
+        $params->limit = 2;
         $params->hostids = $hostids;
-        $params->output = "extend";
-        $body->params       = $params;
+        $body->params    = $params;
 
         $body->id   = 1;
         $body->auth = $response->toArray()["result"];
