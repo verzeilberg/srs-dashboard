@@ -16,19 +16,13 @@ class DashboardController extends AbstractController
      */
     public function index(ZabbixClient $zabbixClient): Response
     {
-        $hosts = $zabbixClient->getHosts(['production-gluster']);
+        $hosts = $zabbixClient->getHosts(['production-db']);
+
         $ids = [
-            10320,
-            10322,
-            10321,
-            10323,
-            10373,
-            10374
+            10340
         ];
         $alerts = $zabbixClient->getAlerts($ids);
-
-        echo '<pre>';
-        var_dump($alerts); die;
+        $problems = $zabbixClient->getProblems($ids);
 
         return $this->render('dashboard/index.html.twig', [
             'hosts' => $hosts
@@ -48,10 +42,14 @@ class DashboardController extends AbstractController
         }
 
         $hostIds = $request->get('hostids');
-
-        $problems = $zabbixClient->getAlerts($hostIds);
-
-
+        $problems = [];
+        foreach ($hostIds as $hostId)
+        {
+            $problem = $zabbixClient->getProblems([$hostId]);
+            if (array_key_exists(0, $problem)) {
+                $problems[$hostId]['problem'] = $problem[0]->name;
+            }
+        }
         return new JsonResponse($problems);
     }
 }

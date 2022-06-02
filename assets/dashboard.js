@@ -34,9 +34,6 @@ function updateServerStatus()
         let dataId = $(this).data("hostid");
         hostids.push(dataId)
     });
-
-    console.log(hostids);
-
     $.ajax({
         url: '/get_host_ids',
         type: 'POST',
@@ -46,6 +43,17 @@ function updateServerStatus()
         dataType: 'json',
         async: true,
         success: function (data) {
+console.log('start');
+            $.each( data, function( i, l ){
+
+                $('.hostid-'+ i).removeClass('text-bg-success');
+                $('.hostid-'+ i).addClass('text-bg-danger');
+
+                $('.hostid-'+ i + ' > .card-body .card-text > .fa-solid').removeClass('fa-face-smile');
+                $('.hostid-'+ i + ' > .card-body .card-text > .fa-solid').addClass('fa-face-disappointed');
+
+                console.log(i + ': ' + l.problem);
+            });
             console.log(data)
         },
         error: function (xhr, textStatus, errorThrown) {
