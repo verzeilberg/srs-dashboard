@@ -49,10 +49,8 @@ console.log('start');
                 $('.hostid-'+ i).removeClass('text-bg-success');
                 $('.hostid-'+ i).addClass('text-bg-danger');
 
-                $('.hostid-'+ i + ' > .card-body .card-text > .fa-solid').removeClass('fa-face-smile');
-                $('.hostid-'+ i + ' > .card-body .card-text > .fa-solid').addClass('fa-face-disappointed');
-
-                console.log(i + ': ' + l.problem);
+                $('.hostid-'+ i).children('.card-body').children('p.card-text').children('svg').toggleClass('fa-face-smile fa-face-angry');
+                $('.hostid-'+ i).children('.card-body').children('p.card-text').children('span.problem').text(l.problem);
             });
             console.log(data)
         },
