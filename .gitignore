@@ -31,3 +31,4 @@ index\.php
 mix-manifest\.json
 
 .env
+.env.dist

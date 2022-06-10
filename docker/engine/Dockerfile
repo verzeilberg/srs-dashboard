@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:7-fpm-alpine
 
 LABEL maintainer="Fred Gauthier <fred.gauthier.dev@gmail.com>" \
     Description="A lightweigth PHP 7.4 container for Symfony with Xdebug and Composer, build with Alpine"

@@ -19,21 +19,102 @@
                 <div class="digital-clock">00:00:00</div>
             </div>
         </div>
-        <div class="row mt-4">
-            {% for host in hosts %}
-                <div class="col-md-2 mb-4 text-center">
-                    <div class="card text-bg-success host hostid-{{ host.hostid }}"  data-hostid="{{ host.hostid }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ host.name }}</h5>
-                            <p class="card-text">
-                                <i class="fa-solid fa-2xl fa-face-smile"></i><br/>
-                                <span class="problem"></span>
-                            </p>
-                        </div>
-                    </div>
 
+        <div class="row">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="nav-dbdedicated" data-bs-toggle="tab" href="#dbdedicated">DB Dedicated</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nav-dbshared" data-bs-toggle="tab" href="#dbshared">DB Shared</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nav-gluster" data-bs-toggle="tab" href="#gluster">Gluster</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nav-transfer" data-bs-toggle="tab" href="#transfer">Transfer</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row">
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active show  container-fluid" id="dbdedicated">
+                    <div class="row mt-4">
+                        {% for hostDedicated in hostsDedicated %}
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="card text-bg-success h-100 host hostid-{{ hostDedicated.hostid }}"
+                                     data-hostid="{{ hostDedicated.hostid }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ hostDedicated.name }}</h5>
+                                        <p class="card-text">
+                                            <i class="fa-solid fa-2xl fa-face-smile"></i><br/>
+                                            <span class="problem"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            {% endfor %}
+                <div class="tab-pane container-fluid fade" id="dbshared">
+                    <div class="row mt-4">
+                        {% for hostShared in hostsShared %}
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="card text-bg-success h-100 host hostid-{{ hostShared.hostid }}"
+                                     data-hostid="{{ hostShared.hostid }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ hostShared.name }} {{ hostShared.hostid }}</h5>
+                                        <p class="card-text">
+                                            <i class="fa-solid fa-2xl fa-face-smile"></i><br/>
+                                            <span class="problem"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="tab-pane container-fluid fade" id="gluster">
+                    <div class="row mt-4">
+                        {% for hostGluster in hostsGluster %}
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="card text-bg-success h-100 host hostid-{{ hostGluster.hostid }}"
+                                     data-hostid="{{ hostGluster.hostid }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ hostGluster.name }}</h5>
+                                        <p class="card-text">
+                                            <i class="fa-solid fa-2xl fa-face-smile"></i><br/>
+                                            <span class="problem"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="tab-pane container-fluid fade" id="transfer">
+                    <div class="row mt-4">
+                        {% for hostTransfer in hostsTransfer %}
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="card text-bg-success h-100 host hostid-{{ hostTransfer.hostid }}"
+                                     data-hostid="{{ hostTransfer.hostid }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ hostTransfer.name }}</h5>
+                                        <p class="card-text">
+                                            <i class="fa-solid fa-2xl fa-face-smile"></i><br/>
+                                            <span class="problem"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    <!-- Loading panel -->
+    <div class="loading">Loading&#8230;</div>
 {% endblock %}

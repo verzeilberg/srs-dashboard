@@ -3,6 +3,7 @@
 namespace App\Service\Zabbix;
 
 use App\System\DotEnv;
+use JsonException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -10,19 +11,19 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use stdClass;
+
 class ZabbixClient
 {
-    protected $container;
-    protected $httpClient;
-    protected $zabbixCredentialsHost;
+    protected ContainerInterface $container;
+    protected HttpClientInterface $httpClient;
+
     protected $zabbixCredentialsUsername;
     protected $zabbixCredentialsPassword;
 
-    const client_host = "https://spectacles.storeinfo.nl/api_jsonrpc.php";
-    const client_username = "";
-    const client_password = "";
+    public const client_host = "https://spectacles.storeinfo.nl/api_jsonrpc.php";
 
     public function __construct(ContainerInterface $container)
     {
@@ -76,15 +77,11 @@ class ZabbixClient
         $body->method  = 'host.get';
 
         $params           = new \stdClass();
-        $params->output     = [
-            'hostid',
-            'host',
-            'name'
-        ];
-        $params->selectInterfaces = [
-            'interfaceid',
-            'ip'
-        ];
+        $params->output     = "extend";
+        $params->selectInterfaces = "extend";
+        $params->selectAcknowledges = "extend";
+        $params->selectTags = "extend";
+        $params->selectSuppressionData = "extend";
 
         if (count($search) > 0) {
             $host = new \stdClass();
@@ -107,7 +104,15 @@ class ZabbixClient
 
     }
 
-    public function getProblems(array $hostids)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     */
+    public function getProblems(? bool $recent = false, int $limit = 0, array $hostids = null)
     {
         $response = $this->login();
 
@@ -117,9 +122,22 @@ class ZabbixClient
 
         $params             =  new \stdClass();
         $params->output = "extend";
-        $params->hostids = $hostids;
-        $params->recent = true;
-        $params->limit = 1;
+        $params->selectAcknowledges = "extend";
+        $params->selectTags = "extend";
+        $params->selectSuppressionData = "extend";
+        $params->recent = $recent;
+        if (!empty($hostids)) {
+            $params->hostids = $hostids;
+        }
+        if ($recent === false) {
+            $timeTill = time();
+            $timeFrom = $timeTill - (60 * 60 * 24 * 14);
+            $params->time_from = $timeFrom;
+            $params->time_till = $timeTill;
+        }
+        if ($limit > 0) {
+            $params->limit = $limit;
+        }
         $params->sortfield  =  ["eventid"];
         $params->sortorder  = "DESC";
         $body->params       = $params;
@@ -127,7 +145,7 @@ class ZabbixClient
         $body->id   = 1;
         $body->auth = $response->toArray()["result"];
 
-        $jsonEncodedBody = json_encode($body);
+        $jsonEncodedBody = json_encode($body, JSON_THROW_ON_ERROR);
 
         return $this->returnResultObjects($this->httpClient->request('POST', self::client_host, ['body' => $jsonEncodedBody]));
     }
@@ -138,6 +156,7 @@ class ZabbixClient
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws JsonException
      */
     public function getAlerts(array $hostids)
     {
@@ -150,25 +169,34 @@ class ZabbixClient
         $params          =  new \stdClass();
 
         $params->output  = 'extend';
+        $timeTill = time();
+        $timeFrom = $timeTill - (60*60*24);
+        $params->time_from = $timeFrom;
+        $params->time_till = $timeTill;
         $params->sortfield  =  ["clock"];
         $params->sortorder  = "DESC";
-        $params->limit = 2;
+        $params->limit = 1;
         $params->hostids = $hostids;
         $body->params    = $params;
 
         $body->id   = 1;
         $body->auth = $response->toArray()["result"];
 
-        $jsonEncodedBody = json_encode($body);
+        $jsonEncodedBody = json_encode($body, JSON_THROW_ON_ERROR);
 
         return $this->returnResultObjects($this->httpClient->request('POST', self::client_host, ['body' => $jsonEncodedBody]));
     }
 
+
+    /**
+     * @throws JsonException
+     */
     private function returnResultObjects($result)
     {
 
-        $result = json_decode($result->getContent());
-        return $result->result;
+        $data = json_decode($result->getContent(), false, 512, JSON_THROW_ON_ERROR);
+
+        return $data->result;
     }
 
 
